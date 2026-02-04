@@ -1,0 +1,439 @@
+{
+  "name": "Postagem Grupos Zap",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a9fec955-4359-46d0-a78e-8eb04f36d56b",
+              "name": "mensagem",
+              "value": "={{$json[\"conteúdo\"]}}\n\nConfira a matéria completa:\n{{$json[\"link\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1456,
+        16
+      ],
+      "id": "b50751b1-c624-4a4b-a1af-3654d3deb7c0",
+      "name": "Postagem",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2128,
+        16
+      ],
+      "id": "ce2c19f3-314b-401a-9ce0-0093d107b3fe",
+      "name": "Gatilho agendado"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1oH2tDos8jJIuMHfx_tboU8P5v3qWxDhw29cCVFarEv0",
+          "mode": "list",
+          "cachedResultName": "Postagem Whatsapp.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oH2tDos8jJIuMHfx_tboU8P5v3qWxDhw29cCVFarEv0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oH2tDos8jJIuMHfx_tboU8P5v3qWxDhw29cCVFarEv0/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "Pendente"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1904,
+        16
+      ],
+      "id": "c77f1c10-a82f-450e-aa78-36f2b3676504",
+      "name": "Pegando conteúdo",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RvSds1bMGZ0OEKYl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc5737b2-b957-444f-9b3e-78bec9dca413",
+              "name": "grupo",
+              "value": "=[\n \"120363424756766111@g.us\",\n \"120363426673339785@g.us\",\n \"120363423971064844@g.us\",\n \"120363426105681532@g.us\",\n \"120363422829933928@g.us\",\n \"120363424228945803@g.us\",\n \"120363405940401529@g.us\",\n \"120363407476260707@g.us\",\n \"120363423979547815@g.us\",\n \"120363425260521304@g.us\",\n \"120363405361140640@g.us\"\n]",
+              "type": "array"
+            },
+            {
+              "id": "944acba0-a00d-4d75-980e-15c4d5604eb3",
+              "name": "mensagem",
+              "value": "={{$json[\"mensagem\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1232,
+        16
+      ],
+      "id": "eff9f847-0327-4dc2-9e47-7e8bdd3e3a33",
+      "name": "lista grupos"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -1680,
+        16
+      ],
+      "id": "f7c50e49-61cd-4455-9077-18235b26bbf8",
+      "name": "Pega um conteúdo"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "grupo",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        16
+      ],
+      "id": "43090f7b-76d3-4314-97d1-561911c90b95",
+      "name": "envia uma por vez"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://evolution-api:8080/message/sendText/evolution",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "analises2026"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('envia uma por vez').item.json.grupo }}"
+            },
+            {
+              "name": "=text",
+              "value": "={{ $('envia uma por vez').item.json.mensagem }}"
+            },
+            {
+              "name": "delay",
+              "value": "={{ 1200 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -784,
+        16
+      ],
+      "id": "acb7480c-44c1-4596-b037-85844793255c",
+      "name": "envio postagem"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1oH2tDos8jJIuMHfx_tboU8P5v3qWxDhw29cCVFarEv0",
+          "mode": "list",
+          "cachedResultName": "Postagem Whatsapp.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oH2tDos8jJIuMHfx_tboU8P5v3qWxDhw29cCVFarEv0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1oH2tDos8jJIuMHfx_tboU8P5v3qWxDhw29cCVFarEv0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "Enviado",
+            "id": "={{ $node[\"Pega um conteúdo\"].json[\"id\"].toString().padStart(4, '0') }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "conteúdo",
+              "displayName": "conteúdo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "link",
+              "displayName": "link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "imagem_id",
+              "displayName": "imagem_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -560,
+        16
+      ],
+      "id": "259e3e98-113f-4ce6-a3f8-857cdc609138",
+      "name": "marca enviado",
+      "alwaysOutputData": true,
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "RvSds1bMGZ0OEKYl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Busca de Conteúdo\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nEste bloco consulta a planilha 'Postagem Whatsapp' todos os dias às 09:00. Ele filtra apenas as linhas com status Pendente e o nó 'Pega um conteúdo' (Limit) garante que apenas uma postagem seja processada por vez para evitar envios duplicados ou spam.\"",
+        "height": 432,
+        "width": 688,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2224,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "58912863-5b9f-4b96-b396-210686a97a04",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "Formatação\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nO nó 'Postagem' monta o corpo do texto unindo o conteúdo e o link da planilha. Em seguida, o nó 'lista grupos' define manualmente o array de IDs dos grupos de WhatsApp para onde a notícia será enviada.\"",
+        "height": 432,
+        "width": 464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1536,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "04a40774-95ca-4929-9525-0d9178992d6e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Envio e Controle de Status\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nO nó 'envia uma por vez' (Split Out) separa a lista de grupos para que cada um receba a mensagem individualmente via Evolution API. Após o envio para todos os grupos, o nó final volta na planilha e altera o status para Enviado, usando o ID da linha como referência.\"",
+        "height": 432,
+        "width": 720,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1072,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "bfd2149f-ee79-40a8-b6da-f504681d601e",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gatilho agendado": {
+      "main": [
+        [
+          {
+            "node": "Pegando conteúdo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pegando conteúdo": {
+      "main": [
+        [
+          {
+            "node": "Pega um conteúdo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postagem": {
+      "main": [
+        [
+          {
+            "node": "lista grupos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "lista grupos": {
+      "main": [
+        [
+          {
+            "node": "envia uma por vez",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega um conteúdo": {
+      "main": [
+        [
+          {
+            "node": "Postagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envia uma por vez": {
+      "main": [
+        [
+          {
+            "node": "envio postagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "envio postagem": {
+      "main": [
+        [
+          {
+            "node": "marca enviado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "6c5d217c-7a7a-4779-9401-59e61d5603de",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b53759db222f0e2645b98babbe8b89fbc915d3061d917c9e0792cddc01d981cc"
+  },
+  "id": "2_9DMYp4kx-ZM-N1RqFYe",
+  "tags": []
+}
