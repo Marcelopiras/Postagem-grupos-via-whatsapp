@@ -1,7 +1,7 @@
 <img width="1585" height="579" alt="image" src="https://github.com/user-attachments/assets/e496c5cf-6fbc-420b-a473-c6432773db5c" />
 
 # Postagem-grupos-via-whatsapp
-Automação desenvolvida no n8n para envio programado de conteúdos via WhatsApp utilizando Evolution API e Google Sheets como banco de dados
+Automação desenvolvida no n8n para envio programado de conteúdos via WhatsApp, utilizando Evolution API e Google Sheets como banco de dados
 
 ## Fluxo do Processo
 
